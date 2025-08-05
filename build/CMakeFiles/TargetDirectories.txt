@@ -1,0 +1,2 @@
+/home/philipp/VSCodeProjects/Game-project/build/CMakeFiles/edit_cache.dir
+/home/philipp/VSCodeProjects/Game-project/build/CMakeFiles/rebuild_cache.dir
