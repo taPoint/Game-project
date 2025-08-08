@@ -36,13 +36,12 @@ class Battle {
   BattleResult result_;
 
  public:
-  void Fight(Group first, Group second);
-  int CalculateBattleDuration(Group first, Group second);
+  void Fight(Group& first, Group& second);
+  int CalculateBattleDuration(Group& first, Group& second);
   BattleSituation GetBattleSituation(Group& group);  // возвращает объект с ситуацией на поле боя (берёт
                                                      // данные с групп, местности и из них стряпает объект)
-  void UpdateBattleSituation(BattleSituation& situation, Group& group);
   int GetProfabilityOfDecision();
-  int DefineBattleSituation(Group first, Group second);
+  int DefineBattleSituation(Group& first, Group& second);
 };
 
 #endif
