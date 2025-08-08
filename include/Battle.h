@@ -16,9 +16,10 @@ struct TypeOfTerrain {  // равнина, холмы, лес, мелковод�
 };
 
 struct BattleSituation {  // ситуация на поле боя обновляется у каждого командира каждый ход
-  short organisation;     // 0-5
+  short organisation;     // 0-100
   short morale;           // 0-100
-  short strength;         // Превосходим / Равны / Уступаем
+                          //
+  short strength;         //
   short advantage;        // позиционное преимущество (местность, укрепления, укрытия)
 };
 
@@ -31,14 +32,16 @@ struct BattleResult {
 class Battle {
  private:
   std::string battle_name_;
-  BattleResult result_;
   TypeOfTerrain terrain_;
+  BattleResult result_;
 
  public:
   void Fight(Group first, Group second);
   int CalculateBattleDuration(Group first, Group second);
-  BattleSituation GetBattleSituation(Group first, Group second);  // возвращает объект с ситуацией на поле боя (берёт
-                                                                  // данные с групп, местности и из них стряпает объект)
+  BattleSituation GetBattleSituation(Group& group);  // возвращает объект с ситуацией на поле боя (берёт
+                                                     // данные с групп, местности и из них стряпает объект)
+  void UpdateBattleSituation(BattleSituation& situation, Group& group);
+  int GetProfabilityOfDecision();
   int DefineBattleSituation(Group first, Group second);
 };
 

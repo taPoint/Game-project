@@ -28,9 +28,9 @@ class Group {
   void AddMorale(int num) { morale_ += num; }
   void AddCommander(Commander commander) { commander_ = commander; }
 
-  void Attack() {}
-  void Defence() {}
-  void ChooseTactics() {}
+  void Attack();
+  void Defend();
+  void ChooseTactics();
 };
 
 #endif

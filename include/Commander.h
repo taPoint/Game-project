@@ -20,9 +20,17 @@ class Commander {
  public:
   Commander(std::string name, short attack_skill, short defence_skill, short leadership_skill, short strategy_skill);
 
-  void TakePartInBattle();          // метод для участия в битве (поднятие морали + боевая единица)
-  void MakeDecision();              // метод для принятия решения в битве (атака/перегруппировка оборона/контратака)
-  void CommandGroup(Group& group);  // метод для управления группой во время боя
+  void TakePartInBattle();  // метод для участия в битве (поднятие морали + боевая единица)
+  float CalculateAttackDecisionScore(BattleSituation situation);
+  float CalculateDefendDecisionScore(BattleSituation situation);
+  float CalculateRegroupDecisionScore(BattleSituation situation);
+  void Attack(Group& group);
+  void Defend(Group& group);
+  void Regroup(Group& group);
+  void CounterAttack(Group& group);
+  void Retreat(Group& group);
+  void MakeDecision(BattleSituation& situation);  // метод для принятия решения в битве
+  void CommandGroup(Group& group);                // метод для управления группой во время боя
 
   std::string GetName() const { return name_; }
   short GetAttackSkill() const { return attack_skill_; }
