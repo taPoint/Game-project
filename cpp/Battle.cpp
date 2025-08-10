@@ -3,10 +3,19 @@
 #include "../include/Group.h"
 #include "../include/Warriors.h"
 
-int Battle::CalculateBattleDuration(Group& first, Group& second) {
+short Battle::CalculateBattleDuration(Group& first, Group& second) {
   float ratio = std::min(first.GetSize(), second.GetSize()) / float(std::max(first.GetSize(), second.GetSize()));
   int base_time = 10;
   return static_cast<int>(base_time * ratio);
+}
+
+BattleSituation Battle::GetBattleSituation(Group& group) {
+  BattleSituation situation;
+  situation.morale = group.GetMorale();
+  situation.organisation situation.strength = group.CalculateGroupStrength();  // временно
+  situation.advantage = 0;
+
+  return situation;
 }
 
 void Battle::Fight(Group& first, Group& second) {
@@ -19,8 +28,8 @@ void Battle::Fight(Group& first, Group& second) {
   BattleSituation situation_second = GetBattleSituation(second);
 
   for (int step = 0; step < battle_duration; ++step) {
-    commander_first.MakeDecision(situation_first);
-    commander_second.MakeDecision(situation_second);
+    commander_first.MakeDecision(first, second);
+    commander_second.MakeDecision(second, second);
 
     commander_first.CommandGroup(first);
     commander_second.CommandGroup(second);
@@ -28,18 +37,6 @@ void Battle::Fight(Group& first, Group& second) {
     situation_first = GetBattleSituation(first);
     situation_second = GetBattleSituation(second);
   }
-}
-
-BattleSituation Battle::GetBattleSituation(Group& group) {
-  BattleSituation situation;
-  situation.morale = group.GetMorale();
-  situation.organisation < 40 ? (situation.morale < 20 ? 60 : 75)
-                              : 90;  // если мораль на момент начала боя низкая, то организация ниже базовой
-
-  situation.strength = 0;   // временно
-  situation.advantage = 0;  // здесь можно добавить логику для расчёта позиционного преимущества
-
-  return situation;
 }
 
 //   битва проходит так - проходят шаги времени битвы
@@ -61,33 +58,16 @@ BattleSituation Battle::GetBattleSituation(Group& group) {
 //   (если контратака успешна и дан приказ её развивать или наступление на следующем шагу выгодно, то группа противника
 //   со следующего после контратаки хода переходит в положение обороняющегося, а атакующая - в положение атакующего)
 
-// 3. выгодность решения определяется переменной выгодности решения (attack_decision_profitability и другие),
-// для каждого решения она считается по своему, но всегда зависит от боевого духа, организации, соотношения боевых
-// сил, навыков командира.
-// чем выше эта переменная, тем выгоднее это решение и тем больше шансов что командир его примет
+//   3. выгодность решения определяется переменной выгодности решения (attack_decision_profitability и другие),
+//   для каждого решения она считается по своему, но всегда зависит от боевого духа, организации, соотношения боевых
+//   сил, навыков командира.
+//   чем выше эта переменная, тем выгоднее это решение и тем больше шансов что командир его примет
+//   (навык стратегии командира повышает эту вероятность ещё больше)
 
-// 3.1. при каком group_power_ratio какое решение становится выгодным: (в положении атакующего)
-// - group_power_ratio > 1.15 && мораль > 40 && организация > 45, то выгодней наступать
-// - group_power_ratio >= 0.9 && <= 1.15, || организация <= 45 то выгодней перегруппироваться
-// - group_power_ratio < 0.8 || организация < 35, то выгодней перейти к обороне (но не перейдёт без разрешения от ком.
-// армии)
-
-//   3.2. при каком group_power_ratio какое решение становится выгодным: (в положении обороняющегося)
-//   - group_power_ratio > 0,5 && < 1 && мораль > 45 && организация > 45, то выгодней обороняться
-//   - group_power_ratio <= 0,5 || мораль < 35 || организация < 35, то выгодней отступать (но не начнёт отступать без
-//   разрешения от ком. армии)
-//   - group_power_ratio >= 0.9 && (организация противника < 50 || мораль противника < 50), то выгодно контратаковать
 //   подумать про влияние морали и организации не модификаторами
-
-//   !!в group_power_ratio уже учитываются влияние боевого духа и организации!!
-
-//   чем выше group ratio от написанных значений в условиях, тем выгоднее решение
 
 //   боевая сила группы определяется по количеству, организованности и боевому духу (морали) войск, их характеристикам,
 //   навыкам атаки/защиты командира
-
-//   чем больше навыки командира, тем больше шанс что он выберет выгодное решение
-//   (командир оценивает ситуацию и принимает решение на основе своих навыков и текущего положения группы)
 
 //   при этом, выбранное выгодное решение не гарантируют разгром противника или нанесения ему больших
 //   потерь (например, если командир принимает выгодное решение атаковать, то противник может тоже принять выгодное

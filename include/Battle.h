@@ -10,15 +10,12 @@
 #include "Warriors.h"
 
 struct TypeOfTerrain {  // равнина, холмы, лес, мелководная река (каждая имеет своё количество очков преимущества)
-  std::string terrain_under_first_group;
-  std::string terrain_beetween_groups;
-  std::string terrain_under_second_group;
+  std::vector<short> terrain_;  // вектор с 10 значениями описывающий местность
 };
 
 struct BattleSituation {  // ситуация на поле боя обновляется у каждого командира каждый ход
   short organisation;     // 0-100
   short morale;           // 0-100
-                          //
   short strength;         //
   short advantage;        // позиционное преимущество (местность, укрепления, укрытия)
 };
@@ -37,11 +34,9 @@ class Battle {
 
  public:
   void Fight(Group& first, Group& second);
-  int CalculateBattleDuration(Group& first, Group& second);
+  short CalculateBattleDuration(Group& first, Group& second);
   BattleSituation GetBattleSituation(Group& group);  // возвращает объект с ситуацией на поле боя (берёт
                                                      // данные с групп, местности и из них стряпает объект)
-  int GetProfabilityOfDecision();
-  int DefineBattleSituation(Group& first, Group& second);
 };
 
 #endif
