@@ -16,106 +16,138 @@ Commander::Commander(std::string name, float attack_skill, float defence_skill, 
 
 void Commander::TakePartInBattle() {}
 
-float Commander::CalculateAttackScore(Group& self, Group& enemy) {
-  float score = 0;
-  score += self.GetMorale() - enemy.GetMorale();
-  score += self.GetOrganisation() - enemy.GetOrganisation();
-  score *= self.CalculateGroupStrength() / enemy.CalculateGroupStrength();
-  score *= attack_skill_;
-  return score <= 0 ? 0 : score;
-}
+// std::string Commander::MakeDecision(Group& self, Group& enemy) {
+//   float type_of_order = self.GetTypeOfOrder();
+//   float group_power_ratio = self.CalculateGroupStrength() / enemy.CalculateGroupStrength();
 
-float Commander::CalculateDefendScore(Group& self, Group& enemy) {
-  float score = 0;
-  score -= self.GetMorale() + enemy.GetMorale();
-  score -= self.GetOrganisation() + enemy.GetOrganisation();
-  score /= self.CalculateGroupStrength() / enemy.CalculateGroupStrength();
-  score *= defence_skill_;
-  return score <= 0 ? 0 : score;
-}
+//   // определяем число, соответствующее выбранному решению
+//   std::random_device rd;                           // источник случайности
+//   std::mt19937 gen(rd());                          // генератор случайных чисел
+//   std::uniform_real_distribution<> dis(0.0, 1.0);  // диапазон [0, 1]
+//   float random_value = dis(gen);                   // случайное значение от 0 до 1
 
-float Commander::CalculateRegroupScore(Group& self, Group& enemy) {
-  float score = 0;
-  score += enemy.GetMorale() - self.GetMorale();
-  score += enemy.GetOrganisation() - self.GetOrganisation();
-  score /= self.CalculateGroupStrength() / enemy.CalculateGroupStrength();
-  score *= defence_skill_;
-  return score <= 0 ? 0 : score;
-}
+//   if (type_of_order == 0 || group_power_ratio > 1) {
+//     float attack_decision_score = CalculateAttackScore(self, enemy);
+//     float defend_decision_score = CalculateDefendScore(self, enemy);
+//     float regroup_decision_score = CalculateRegroupScore(self, enemy);
 
-float Commander::CalculateCounterAttackScore(Group& self, Group& enemy) {
-  float score = 0;
-  score += enemy.GetMorale() - self.GetMorale();
-  score += enemy.GetOrganisation() - self.GetOrganisation();
-  score /= self.CalculateGroupStrength() / enemy.CalculateGroupStrength();
-  score *= attack_skill_;
-  return score <= 0 ? 0 : score;
-}
+//     // нормируем вероятности (получаем вероятности от 0.0 до 1.0)
+//     float sum = attack_decision_score + defend_decision_score + regroup_decision_score;
+//     float attack_probability = attack_decision_score / sum;
+//     float defend_probability = defend_decision_score / sum;
+//     float regroup_probability = regroup_decision_score / sum;
 
-float Commander::CalculateRetreatScore(Group& self, Group& enemy) {
-  float score = 0;
-  score += enemy.GetMorale() - self.GetMorale();
-  score += enemy.GetOrganisation() - self.GetOrganisation();
-  score /= self.CalculateGroupStrength() / enemy.CalculateGroupStrength();
-  score *= defence_skill_;
-  return score <= 0 ? 0 : score;
-}
+//     if (random_value < attack_probability) {
+//       self.Attack(enemy);
+//     } else if (random_value < attack_probability + regroup_probability) {
+//       self.Regroup(enemy);
+//     } else {
+//       if (type_of_order == 0) {
+//         RequestDefense();
+//         self.Regroup(enemy);
+//       } else {
+//         self.Defend(enemy);
+//       }
+//     }
 
-void Commander::MakeDecision(Group& self, Group& enemy) {
-  float type_of_order = self.GetTypeOfOrder();
-  float group_power_ratio = self.CalculateGroupStrength() / enemy.CalculateGroupStrength();
+//   } else if (type_of_order == 1 || group_power_ratio <= 1) {
+//     float attack_decision_score = CalculateAttackScore(self, enemy);
+//     float defend_decision_score = CalculateDefendScore(self, enemy);
+//     float counter_attack_decision_score = CalculateCounterAttackScore(self, enemy);
+//     float retreat_decision_score = CalculateRetreatScore(self, enemy);
 
-  if (type_of_order == 0 || group_power_ratio > 1) {
-    float attack_decision_score = CalculateAttackScore(self, enemy);
-    float defend_decision_score = CalculateDefendScore(self, enemy);
-    float regroup_decision_score = CalculateRegroupScore(self, enemy);
+//     float sum = attack_decision_score + defend_decision_score + counter_attack_decision_score +
+//     retreat_decision_score; float attack_probability = attack_decision_score / sum; float defend_probability =
+//     defend_decision_score / sum; float counter_attack_probability = counter_attack_decision_score / sum; float
+//     retreat_probability = retreat_decision_score / sum;
 
-    // нормируем вероятности (получаем вероятности от 0.0 до 1.0)
-    float sum = attack_decision_score + defend_decision_score + regroup_decision_score;
-    float attack_probability = attack_decision_score / sum;
-    float defend_probability = defend_decision_score / sum;
-    float regroup_probability = regroup_decision_score / sum;
+//   } else {
+//     self.Retreat(enemy);
+//   }
+//   return " ";
+// }
 
-    // определяем число, соответствующее выбранному решению
-    std::random_device rd;                           // источник случайности
-    std::mt19937 gen(rd());                          // генератор случайных чисел
-    std::uniform_real_distribution<> dis(0.0, 1.0);  // диапазон [0, 1]
-    float random_value = dis(gen);                   // случайное значение от 0 до 1
+std::string Commander::MakeAttackDecision(Group& self, Group& enemy) {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_real_distribution<> dis(0.0, 1.0);
+  float random_value = dis(gen);
 
-    // представим вероятность как:
-    // от 0 до attack_probability - атака
-    // от attack_probabilty до attack_probabilty + regroup_probability - перегруппировка
-    // от attack_probabilty + regroup_probability до 1 - оборона
-    if (random_value < attack_probability) {
-      self.Attack();
-    } else if (random_value < attack_probability + regroup_probability) {
-      self.Regroup();
-    } else {
-      if (type_of_order == 0) {
-        RequestDefense();
-        self.Regroup();
-      } else {
-        self.Defend();
-      }
-    }
+  std::string decision = 0;
 
-  } else if (type_of_order == 1) {
-    float attack_decision_score = CalculateAttackScore(self, enemy);
-    float defend_decision_score = CalculateDefendScore(self, enemy);
-    float counter_attack_decision_score = CalculateCounterAttackScore(self, enemy);
-    float retreat_decision_score = CalculateRetreatScore(self, enemy);
+  float attack_decision_score = self.CalculateAttackScore(enemy);
+  float defend_decision_score = self.CalculateDefendScore(enemy);
+  float regroup_decision_score = self.CalculateRegroupScore(enemy);
 
-    float sum = attack_decision_score + defend_decision_score + counter_attack_decision_score + retreat_decision_score;
-    float attack_probability = attack_decision_score / sum;
-    float defend_probability = defend_decision_score / sum;
-    float counter_attack_probability = counter_attack_decision_score / sum;
-    float retreat_probability = retreat_decision_score / sum;
+  float sum = attack_decision_score + defend_decision_score + regroup_decision_score;
+  float attack_probability = attack_decision_score / sum;
+  float defend_probability = defend_decision_score / sum;
+  float regroup_probability = regroup_decision_score / sum;
 
+  // представим вероятность как:
+  // от 0 до attack_probability - атака
+  // от attack_probabilty до attack_probabilty + regroup_probability - перегруппировка
+  // от attack_probabilty + regroup_probability до 1 - оборона
+  if (random_value < attack_probability) {
+    decision = "Наступление";
+    self.Attack(enemy);
+  } else if (random_value < attack_probability + regroup_probability) {
+    decision = "Перегруппировка";
+    self.Regroup(enemy);
   } else {
-    self.Retreat();
+    decision = "Переход к обороне";
+    self.Defend(enemy);
+  }
+
+  return decision;
+}
+
+std::string Commander::MakeDefendDecision(Group& self, Group& enemy) {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_real_distribution<> dis(0.0, 1.0);
+  float random_value = dis(gen);
+
+  std::string decision = 0;
+
+  float attack_decision_score = self.CalculateAttackScore(enemy);
+  float defend_decision_score = self.CalculateDefendScore(enemy);
+  float counter_attack_decision_score = self.CalculateCounterAttackScore(enemy);
+  float retreat_decision_score = self.CalculateRetreatScore(enemy);
+
+  float sum = attack_decision_score + defend_decision_score + counter_attack_decision_score + retreat_decision_score;
+  float attack_probability = attack_decision_score / sum;
+  float defend_probability = defend_decision_score / sum;
+  float counter_attack_probability = counter_attack_decision_score / sum;
+  float retreat_probability = retreat_decision_score / sum;
+
+  // представим вероятность как:
+  // от 0 до defend_probability - оборона
+  // от defend_probability до defend_probability + counter_attack_probability - контратака
+  // от defend_probability + counter_attack_prob до 1 - отступление
+  if (random_value < defend_probability) {
+    decision = "Оборона";
+    self.Defend(enemy);
+  } else if (random_value < defend_probability + counter_attack_probability) {
+    decision = "Контратака";
+    self.CounterAttack(enemy);
+  } else {
+    decision = "Отступление";
+    self.Retreat(enemy);
   }
 }
 
-void Commander::CommandGroup(Group& group) {
-  // ща поймём вроде и без него как будто обойдёмся
+void Commander::CommandGroup(Group& self, Group& enemy, short& initiative) {
+  // функция выбора решения исходя из положения (атакующий/обороняющий)
+  // float group_power_ratio = self.CalculateGroupStrength() / enemy.CalculateGroupStrength();
+
+  if (initiative == 1) {
+    // принимает решение в положении атакующего
+    MakeAttackDecision(
+        self,
+        enemy);  // приняв решение, в функции этого решения вызывается функция вызова принятия решения для противника
+  } else {
+    // принимает решение в положении обороняющегося
+    MakeDefendDecision(self, enemy);
+  }
 }

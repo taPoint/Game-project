@@ -13,15 +13,9 @@ struct TypeOfTerrain {  // равнина, холмы, лес, мелковод�
   std::vector<short> terrain_;  // вектор с 10 значениями описывающий местность
 };
 
-struct BattleSituation {  // ситуация на поле боя обновляется у каждого командира каждый ход
-  short organisation;     // 0-100
-  short morale;           // 0-100
-  short strength;         //
-  short advantage;        // позиционное преимущество (местность, укрепления, укрытия)
-};
+struct ResulfOfDecision {};
 
 struct BattleResult {
-  BattleSituation situation;
   int attack_losses;     // потери атакующей группы
   int defending_losses;  // потери обороняющейся группы
 };
@@ -34,9 +28,8 @@ class Battle {
 
  public:
   void Fight(Group& first, Group& second);
+  void FightWithoutOrder(Group& first, Group& second);
   short CalculateBattleDuration(Group& first, Group& second);
-  BattleSituation GetBattleSituation(Group& group);  // возвращает объект с ситуацией на поле боя (берёт
-                                                     // данные с групп, местности и из них стряпает объект)
 };
 
 #endif

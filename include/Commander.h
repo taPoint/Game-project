@@ -21,15 +21,12 @@ class Commander {
   Commander(std::string name, float attack_skill, float defence_skill, float leadership_skill, float strategy_skill);
 
   void TakePartInBattle();  // метод для участия в битве (поднятие морали + боевая единица)
+  void RequestDefense();
 
-  float CalculateAttackScore(Group& self, Group& enemy);
-  float CalculateDefendScore(Group& self, Group& enemy);
-  float CalculateRegroupScore(Group& self, Group& enemy);
-  float CalculateCounterAttackScore(Group& self, Group& enemy);
-  float CalculateRetreatScore(Group& self, Group& enemy);
-
-  void MakeDecision(Group& self, Group& enemy);  // метод для принятия решения в битве
-  void CommandGroup(Group& group);               // метод для управления группой
+  std::string MakeAttackDecision(Group& self, Group& enemy);
+  std::string MakeDefendDecision(Group& self, Group& enemy);
+  // std::string ChooseTactics(Group& self, Group& enemy, short initiative);
+  void CommandGroup(Group& self, Group& enemy, short& initiative);  // метод для управления группой
 
   std::string GetName() const { return name_; }
   float GetAttackSkill() const { return attack_skill_; }

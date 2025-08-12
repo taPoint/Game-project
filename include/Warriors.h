@@ -12,10 +12,11 @@
 class Warriors {
  public:
   std::string type_of_warriors_;
-  short num_of_warriors_;
-  short hp_;
-  short damage_;
-  short defence_;
+  float num_of_warriors_;
+  float hp_;
+  float damage_;
+  float defence_;
+  float skill_;
 
   void SetNumOfWarriors(short num) { num_of_warriors_ = num; }
 };

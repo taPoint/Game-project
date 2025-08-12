@@ -9,33 +9,23 @@ short Battle::CalculateBattleDuration(Group& first, Group& second) {
   return static_cast<int>(base_time * ratio);
 }
 
-BattleSituation Battle::GetBattleSituation(Group& group) {
-  BattleSituation situation;
-  situation.morale = group.GetMorale();
-  situation.organisation situation.strength = group.CalculateGroupStrength();  // временно
-  situation.advantage = 0;
-
-  return situation;
-}
-
-void Battle::Fight(Group& first, Group& second) {
-  int battle_duration = CalculateBattleDuration(first, second);
+void Battle::FightWithoutOrder(Group& first, Group& second) {
+  short battle_duration = CalculateBattleDuration(first, second);
 
   Commander commander_first = first.GetCommander();
   Commander commander_second = second.GetCommander();
 
-  BattleSituation situation_first = GetBattleSituation(first);
-  BattleSituation situation_second = GetBattleSituation(second);
+  std::string first_decision;
+  std::string second_decision;
+
+  // определение инициативы для первой группы (если 0 - нет, значит инициатива у второй, если 1 - наоборот)
+  short initiative = Group::CompareGroups(first, second);
 
   for (int step = 0; step < battle_duration; ++step) {
-    commander_first.MakeDecision(first, second);
-    commander_second.MakeDecision(second, second);
-
-    commander_first.CommandGroup(first);
-    commander_second.CommandGroup(second);
-
-    situation_first = GetBattleSituation(first);
-    situation_second = GetBattleSituation(second);
+    // передаём инициативу в функцию командования группой, далее инициатива меняется в зависимости от хода боя в этих
+    // функциях
+    commander_first.CommandGroup(first, second, initiative);
+    commander_second.CommandGroup(first, second, initiative);
   }
 }
 
